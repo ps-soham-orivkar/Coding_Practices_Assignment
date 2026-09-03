@@ -1,11 +1,11 @@
 # Employee Management Console Application
 
-A simple, robust console application written in Python to manage employee records, designed to demonstrate coding best practices.
+A simple, robust console application written in Python to manage employee records, designed to demonstrate coding best practices and clean architectural principles.
 
 ## How to Run the Application
 
 ### Prerequisites
-- Python 3.6 or higher installed.
+- Python 3.7 or higher installed (utilizes `dataclasses` and modern type hints).
 
 ### Steps to Run
 1. Open a terminal or command prompt.
@@ -16,7 +16,7 @@ A simple, robust console application written in Python to manage employee record
    ```
 
 ### Running Tests
-To run the automated unit tests:
+To run the automated unit test suite:
 ```bash
 python -m unittest discover tests
 ```
@@ -28,19 +28,25 @@ python -m unittest discover tests
 - **Update Employee Details:** Update one or multiple fields for an existing employee.
 - **Delete Employee:** Remove an employee from the system.
 - **Filter by Department:** View all employees belonging to a specific department.
-- **Data Persistence:** Automatically saves and loads employee data using a JSON file (`employees.json`).
+- **Data Persistence:** Saves and loads employee data using a JSON file (`employees.json`).
 
 ## Best Practices Followed
 - **Separation of Concerns:** 
-  - `models/employee.py` handles data structure.
-  - `services/employee_service.py` handles business logic and data persistence.
-  - `utils/validators.py` handles pure validation functions.
-  - `main.py` handles the user interface (console interaction).
-- **Meaningful Naming:** Variables and methods have clear, descriptive names (e.g., `filter_employees_by_department` instead of `filter`).
-- **Small and Focused Methods:** Each method does one thing (e.g., `is_valid_email` only validates emails).
-- **Error Handling:** Used `try-except` blocks and `ValueError` to gracefully handle bad user input or missing records without crashing the application.
-- **Validation:** Added email format checking and empty string checking.
-- **Prevention of Duplicates:** Ensures no two employees can share the same Employee ID.
+  - `models/employee.py`: Data structure defined using `@dataclass` with type hints and serialization helpers (`to_dict`, `from_dict`).
+  - `repositories/employee_repository.py`: Dedicated persistence layer managing file I/O and distinguishing between missing vs corrupted/invalid files.
+  - `services/employee_service.py`: Handles business logic, duplicate prevention, searching, sorting, and department filtering.
+  - `utils/validators.py`: Reusable validation functions for non-empty text, email format, alphanumeric ID, and calendar dates (`YYYY-MM-DD`).
+  - `main.py`: Clean presentation and console interaction layer.
+- **Robust Error Handling:** 
+  - Corrupted or invalid JSON data files raise descriptive errors to prevent accidental data loss. Missing files are gracefully initialized.
+  - Clear user-facing error feedback on invalid inputs without application crashes.
+- **Type Annotations:** Consistent typing (`typing` / built-in types) across all classes, parameters, and return types.
+- **Input Validation:**
+  - Employee ID: non-empty alphanumeric format.
+  - Email: RFC-compliant regex format.
+  - Joining Date: valid calendar date in `YYYY-MM-DD` format.
+  - Name / Department / Designation: non-empty string checks.
+- **Comprehensive Unit Testing:** Tests for service logic, edge cases, sorting, filtering, repository persistence, and validation utilities.
 
 ## Screenshots
 
