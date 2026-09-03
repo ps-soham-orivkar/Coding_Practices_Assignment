@@ -1,8 +1,10 @@
 import sys
+from typing import Dict
 from models.employee import Employee
 from services.employee_service import EmployeeService
 
-def print_menu():
+
+def print_menu() -> None:
     """Displays the main application menu."""
     print("\n--- Employee Management Console ---")
     print("1. Add Employee")
@@ -14,11 +16,14 @@ def print_menu():
     print("7. Exit")
     print("-----------------------------------")
 
-def get_user_input(prompt):
-    """Utility function to get input, handles basic clean up."""
+
+def get_user_input(prompt: str) -> str:
+    """Utility function to get input and handle whitespace clean up."""
     return input(prompt).strip()
 
-def add_employee_flow(service):
+
+def add_employee_flow(service: EmployeeService) -> None:
+    """Flow for adding a new employee with interactive validation."""
     print("\n--- Add New Employee ---")
     emp_id = get_user_input("Enter Employee ID: ")
     name = get_user_input("Enter Name: ")
@@ -34,11 +39,13 @@ def add_employee_flow(service):
     except ValueError as e:
         print(f"Error: {e}")
 
-def view_all_employees_flow(service):
+
+def view_all_employees_flow(service: EmployeeService) -> None:
+    """Flow for listing all employees, optionally sorted."""
     print("\n--- All Employees ---")
     sort_choice = get_user_input("Sort by name? (y/n): ")
     sort_by_name = sort_choice.lower() == 'y'
-    
+
     employees = service.get_all_employees(sort_by_name)
     if not employees:
         print("No employees found.")
@@ -46,7 +53,9 @@ def view_all_employees_flow(service):
         for emp in employees:
             print(emp)
 
-def search_employee_flow(service):
+
+def search_employee_flow(service: EmployeeService) -> None:
+    """Flow for searching an employee by ID."""
     print("\n--- Search Employee ---")
     emp_id = get_user_input("Enter Employee ID to search: ")
     emp = service.search_employee_by_id(emp_id)
@@ -56,11 +65,13 @@ def search_employee_flow(service):
     else:
         print("Error: Employee not found.")
 
-def update_employee_flow(service):
+
+def update_employee_flow(service: EmployeeService) -> None:
+    """Flow for updating fields of an existing employee."""
     print("\n--- Update Employee ---")
     emp_id = get_user_input("Enter Employee ID to update: ")
     emp = service.search_employee_by_id(emp_id)
-    
+
     if not emp:
         print("Error: Employee not found.")
         return
@@ -72,12 +83,17 @@ def update_employee_flow(service):
     designation = get_user_input(f"Enter New Designation [{emp.designation}]: ")
     joining_date = get_user_input(f"Enter New Joining Date [{emp.joining_date}]: ")
 
-    updated_data = {}
-    if name: updated_data['name'] = name
-    if email: updated_data['email'] = email
-    if department: updated_data['department'] = department
-    if designation: updated_data['designation'] = designation
-    if joining_date: updated_data['joining_date'] = joining_date
+    updated_data: Dict[str, str] = {}
+    if name:
+        updated_data['name'] = name
+    if email:
+        updated_data['email'] = email
+    if department:
+        updated_data['department'] = department
+    if designation:
+        updated_data['designation'] = designation
+    if joining_date:
+        updated_data['joining_date'] = joining_date
 
     if not updated_data:
         print("No updates provided.")
@@ -89,7 +105,9 @@ def update_employee_flow(service):
     except ValueError as e:
         print(f"Error: {e}")
 
-def delete_employee_flow(service):
+
+def delete_employee_flow(service: EmployeeService) -> None:
+    """Flow for deleting an employee."""
     print("\n--- Delete Employee ---")
     emp_id = get_user_input("Enter Employee ID to delete: ")
     try:
@@ -98,11 +116,13 @@ def delete_employee_flow(service):
     except ValueError as e:
         print(f"Error: {e}")
 
-def filter_employees_flow(service):
+
+def filter_employees_flow(service: EmployeeService) -> None:
+    """Flow for filtering employees by department."""
     print("\n--- Filter Employees by Department ---")
     department = get_user_input("Enter Department Name: ")
     employees = service.filter_employees_by_department(department)
-    
+
     if not employees:
         print(f"No employees found in department: {department}")
     else:
@@ -110,13 +130,20 @@ def filter_employees_flow(service):
         for emp in employees:
             print(emp)
 
-def main():
-    service = EmployeeService()
-    
+
+def main() -> None:
+    """Main application entry point."""
+    try:
+        service = EmployeeService()
+    except ValueError as err:
+        print(f"Initialization Error: {err}")
+        print("Please resolve the data file issue before starting the application.")
+        sys.exit(1)
+
     while True:
         print_menu()
         choice = get_user_input("Select an option (1-7): ")
-        
+
         if choice == '1':
             add_employee_flow(service)
         elif choice == '2':
@@ -134,6 +161,7 @@ def main():
             sys.exit(0)
         else:
             print("Invalid option. Please try again.")
+
 
 if __name__ == "__main__":
     main()
